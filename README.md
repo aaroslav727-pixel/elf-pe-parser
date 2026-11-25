@@ -45,6 +45,29 @@ ctest --test-dir build --output-on-failure
 Options: `BINSEC_BUILD_TESTS=ON` (default) and `BINSEC_BUILD_FUZZER=OFF`
 (default; Clang only).
 
+## Windows app
+
+`binsec-gui.exe` is a native Win32 window over the same library (no external
+dependencies, statically linked, a single file):
+
+- open a file with **Open file...** (Ctrl+O), drag-and-drop, or
+  `binsec-gui.exe <file>` (works with Explorer's *Open with*);
+- views: **Checksec**, **Sections**, **Symbols / imports**, **All**, and a
+  **JSON** switch that shows exactly what `binsec --json` prints;
+- **Save report...** (Ctrl+S) writes the current view to `.txt` or `.json`.
+
+Download `binsec-gui.exe` (and the console `binsec.exe`) from
+[Releases](../../releases). The binaries are not code-signed, so SmartScreen
+may ask for confirmation on the first run.
+
+Build them yourself with MSYS2 (CLANG64 shell, packages
+`mingw-w64-clang-x86_64-{clang,cmake,ninja}`):
+
+```sh
+cmake -S . -B build-release -G Ninja -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXE_LINKER_FLAGS=-static
+cmake --build build-release
+```
+
 ## Usage
 
 ```
@@ -237,6 +260,7 @@ are also capped.
 ```
 include/binsec/   public headers: result, reader, elf, pe, binary, checksec, report
 src/              library sources (binsec_lib) and the CLI (main.cpp -> binsec)
+src/gui/          Win32 GUI (binsec-gui.exe): window, icon, manifest, version resource
 tests/            self-contained test harness, ELF/PE image builders, tests
 fuzz/             libFuzzer harness, standalone driver, corpus generator, corpus/, crashes/
 samples/          C programs, build.sh (hardening matrix), check.sh (expected verdicts)

@@ -51,6 +51,15 @@ add_executable(binsec src/main.cpp)
 target_link_libraries(binsec PRIVATE binsec_lib)
 target_compile_options(binsec PRIVATE ${BINSEC_WARNINGS})
 
+# ---- Windows GUI (binsec-gui.exe) -----------------------------------------
+if(WIN32)
+  enable_language(RC)
+  add_executable(binsec_gui WIN32 src/gui/main_win32.cpp src/gui/binsec_gui.rc)
+  set_target_properties(binsec_gui PROPERTIES OUTPUT_NAME binsec-gui)
+  target_link_libraries(binsec_gui PRIVATE binsec_lib comdlg32 comctl32 shell32 gdi32)
+  target_compile_options(binsec_gui PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${BINSEC_WARNINGS}>)
+endif()
+
 # ---- tests -----------------------------------------------------------------
 if(BINSEC_BUILD_TESTS)
   enable_testing()
