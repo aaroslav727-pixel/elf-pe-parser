@@ -1,0 +1,8 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++ && cmake --build build -j && ctest --test-dir build --output-on-failure

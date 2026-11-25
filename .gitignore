@@ -1,0 +1,15 @@
+build*/
+cmake-build-*/
+.cache/
+compile_commands.json
+*.o
+*.obj
+samples/bin/
+fuzz/artifacts/
+crash-*
+leak-*
+timeout-*
+oom-*
+fuzz-*.log
+.vscode/
+.idea/
