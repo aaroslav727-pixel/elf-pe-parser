@@ -88,8 +88,28 @@ Checksec
   Stripped      No
 ```
 
-The CI log prints `binsec /bin/ls` and `binsec /bin/ls --json` for
-`ubuntu-latest` in the *Example output (/bin/ls)* step.
+### Example: `/bin/ls` on the `ubuntu-latest` CI runner
+
+```
+$ binsec /bin/ls
+File:        /bin/ls
+Format:      ELF64, little-endian
+Type:        DYN (Shared object / PIE)
+Machine:     AMD x86-64
+Entry point: 0x109930
+Interpreter: /lib64/ld-linux-x86-64.so.2
+Headers:     15 program, 34 section
+
+Checksec
+  RELRO         Full RELRO
+  Canary        Canary found
+  NX            NX enabled
+  PIE           PIE enabled
+  Fortify       Yes (3 fortified functions)
+  RPATH         No RPATH
+  RUNPATH       No RUNPATH
+  Stripped      Yes (no .symtab)
+```
 
 ### Example: test PE (`samples/hello.c` built with MinGW clang)
 
@@ -205,7 +225,7 @@ Fuzzing log:
 |-----|--------|------|-------|---------|
 | ELF parser (231 seeds) | standalone mutator, ASan+UBSan, MSYS2 clang 22 | 90 s | 1.2 M | 0 |
 | ELF+PE parser (498 seeds) | standalone mutator, ASan+UBSan, MSYS2 clang 22 | 120 s | 1.4 M | 0 |
-| ELF+PE parser | libFuzzer, ASan+UBSan, Clang 18, GitHub Actions | 60 s | see CI log | see CI log |
+| ELF+PE parser (902 seeds incl. gcc-built samples) | libFuzzer, ASan+UBSan, Clang 21.1, GitHub Actions | 61 s | 148 K | 0 |
 
 A fuzzing-driven review led to one hardening change: only the first
 `SHT_SYMTAB` and the first `SHT_DYNSYM` are parsed. Without that, crafted files
