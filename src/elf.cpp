@@ -332,9 +332,17 @@ Result<ElfFile> parse_elf(std::span<const std::uint8_t> data) {
   BINSEC_TRY(f.segments, parse_segments(r, f.header));
   resolve_section_names(r, f);
 
+  // The ELF spec allows at most one SHT_SYMTAB and one SHT_DYNSYM; parsing only the
+  // first of each also keeps crafted files with many aliased tables from going quadratic.
+  bool have_symtab = false, have_dynsym = false;
   for (const auto& s : f.sections) {
-    if (s.type == elf::SHT_SYMTAB) parse_symbol_table(r, f, s, f.symbols);
-    else if (s.type == elf::SHT_DYNSYM) parse_symbol_table(r, f, s, f.dynamic_symbols);
+    if (s.type == elf::SHT_SYMTAB && !have_symtab) {
+      have_symtab = true;
+      parse_symbol_table(r, f, s, f.symbols);
+    } else if (s.type == elf::SHT_DYNSYM && !have_dynsym) {
+      have_dynsym = true;
+      parse_symbol_table(r, f, s, f.dynamic_symbols);
+    }
   }
   parse_dynamic(r, f);
   parse_interpreter(r, f);

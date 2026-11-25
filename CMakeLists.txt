@@ -55,12 +55,14 @@ if(BINSEC_BUILD_TESTS)
     tests/test_main.cpp
     tests/test_elf.cpp
     tests/test_checksec.cpp
+    tests/test_regression.cpp
     fuzz/fuzz_parser.cpp
   )
   target_link_libraries(binsec_tests PRIVATE binsec_lib)
   target_compile_options(binsec_tests PRIVATE ${BINSEC_WARNINGS})
   target_compile_definitions(binsec_tests PRIVATE
-    BINSEC_CRASH_DIR="${CMAKE_CURRENT_SOURCE_DIR}/fuzz/crashes")
+    BINSEC_CRASH_DIR="${CMAKE_CURRENT_SOURCE_DIR}/fuzz/crashes"
+    BINSEC_CORPUS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/fuzz/corpus")
   add_test(NAME unit_tests COMMAND binsec_tests)
   add_test(NAME cli_usage COMMAND binsec --help)
 endif()
