@@ -34,6 +34,9 @@ add_library(binsec_lib STATIC
   src/reader.cpp
   src/elf.cpp
   src/checksec_elf.cpp
+  src/pe.cpp
+  src/checksec_pe.cpp
+  src/binary.cpp
   src/report.cpp
 )
 target_include_directories(binsec_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -55,6 +58,7 @@ if(BINSEC_BUILD_TESTS)
     tests/test_main.cpp
     tests/test_elf.cpp
     tests/test_checksec.cpp
+    tests/test_pe.cpp
     tests/test_regression.cpp
     fuzz/fuzz_parser.cpp
   )

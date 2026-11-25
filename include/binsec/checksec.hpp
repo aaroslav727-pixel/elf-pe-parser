@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "binsec/elf.hpp"
+#include "binsec/pe.hpp"
 
 namespace binsec {
 
@@ -26,8 +27,23 @@ struct ElfChecksec {
 
 ElfChecksec checksec_elf(const ElfFile& f);
 
+enum class SafeSeh { Yes, No, NoSeh, NotApplicable };  // NotApplicable: PE32+ (table-based unwinding)
+
+struct PeChecksec {
+  bool aslr = false;             // DYNAMIC_BASE
+  bool high_entropy_va = false;  // HIGH_ENTROPY_VA (PE32+ only)
+  bool dep = false;              // NX_COMPAT
+  bool cfg = false;              // GUARD_CF
+  SafeSeh safeseh = SafeSeh::No;  // NO_SEH flag / load config SEHandlerTable (PE32)
+  bool gs = false;                // load config SecurityCookie (__security_cookie)
+  bool authenticode = false;      // certificate in the security directory (not verified)
+};
+
+PeChecksec checksec_pe(const PeFile& f);
+
 std::string_view to_string(Relro v) noexcept;
 std::string_view to_string(Pie v) noexcept;
 std::string_view to_string(Nx v) noexcept;
+std::string_view to_string(SafeSeh v) noexcept;
 
 }  // namespace binsec

@@ -7,7 +7,7 @@
 #include <string_view>
 #include <vector>
 
-#include "binsec/elf.hpp"
+#include "binsec/binary.hpp"
 #include "binsec/report.hpp"
 #include "binsec/version.hpp"
 
@@ -68,7 +68,7 @@ int main(int argc, char** argv) {
   auto data = read_file(path);
   if (!data) return fail(data.error(), path, json);
 
-  auto parsed = binsec::parse_elf(*data);
+  auto parsed = binsec::parse_binary(*data);
   if (!parsed) return fail(parsed.error(), path, json);
   const std::string out = json ? binsec::render_json(*parsed, path, opt) : binsec::render_text(*parsed, path, opt);
   std::fwrite(out.data(), 1, out.size(), stdout);

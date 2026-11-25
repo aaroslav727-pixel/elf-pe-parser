@@ -3,7 +3,7 @@
 #include <string>
 #include <string_view>
 
-#include "binsec/elf.hpp"
+#include "binsec/binary.hpp"
 #include "binsec/result.hpp"
 
 namespace binsec {
@@ -17,6 +17,10 @@ struct ReportOptions {
 
 std::string render_text(const ElfFile& f, std::string_view path, const ReportOptions& opt);
 std::string render_json(const ElfFile& f, std::string_view path, const ReportOptions& opt);
+std::string render_text(const PeFile& f, std::string_view path, const ReportOptions& opt);
+std::string render_json(const PeFile& f, std::string_view path, const ReportOptions& opt);
+std::string render_text(const Binary& b, std::string_view path, const ReportOptions& opt);
+std::string render_json(const Binary& b, std::string_view path, const ReportOptions& opt);
 std::string render_error_json(const Error& e, std::string_view path);
 
 // JSON string escaping; bytes >= 0x80 are emitted as \u00XX so output is always valid JSON.
