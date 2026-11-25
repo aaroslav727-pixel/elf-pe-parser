@@ -15,7 +15,8 @@ using namespace binsec;
 
 namespace {
 void put32(std::vector<std::uint8_t>& v, std::size_t off, std::uint32_t x) {
-  for (int i = 0; i < 4; ++i) v[off + i] = static_cast<std::uint8_t>(x >> (8 * i));
+  if (off > v.size() || v.size() - off < 4) return;  // also silences GCC -Wstringop-overflow false positive
+  for (std::size_t i = 0; i < 4; ++i) v[off + i] = static_cast<std::uint8_t>(x >> (8 * i));
 }
 PeChecksec run(const testpe::Spec& sp) {
   auto r = parse_pe(testpe::build(sp));

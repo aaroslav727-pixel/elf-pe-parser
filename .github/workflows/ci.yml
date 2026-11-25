@@ -1,8 +1,58 @@
 name: ci
-on: [push, pull_request]
+
+on:
+  push:
+  pull_request:
+
 jobs:
-  build:
+  build-test:
+    runs-on: ubuntu-latest
+    env:
+      CXX: clang++
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
+
+      - name: Build
+        run: cmake --build build -j
+
+      - name: Unit tests
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Build samples and verify checksec verdicts
+        run: CC=gcc samples/build.sh && samples/check.sh build/binsec
+
+      - name: Example output (/bin/ls)
+        run: ./build/binsec /bin/ls && ./build/binsec /bin/ls --json
+
+  fuzz:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: cmake -S . -B build -DCMAKE_CXX_COMPILER=clang++ && cmake --build build -j && ctest --test-dir build --output-on-failure
+
+      - name: Toolchain
+        run: |
+          clang++ --version
+          sudo apt-get install -y --no-install-recommends "libclang-rt-$(clang++ -dumpversion | cut -d. -f1)-dev" || true
+
+      - name: Build libFuzzer target (ASan + UBSan)
+        run: |
+          cmake -S . -B build-fuzz -DCMAKE_CXX_COMPILER=clang++ -DBINSEC_BUILD_FUZZER=ON -DBINSEC_BUILD_TESTS=OFF
+          cmake --build build-fuzz --target binsec_fuzz -j
+
+      - name: Extend corpus with freshly built samples
+        run: CC=gcc samples/build.sh && python3 fuzz/gen_corpus.py -o fuzz/corpus samples/bin/*
+
+      - name: Fuzz smoke run (60 s)
+        run: |
+          mkdir -p fuzz/artifacts
+          ./build-fuzz/binsec_fuzz fuzz/corpus -max_total_time=60 -artifact_prefix=fuzz/artifacts/ -print_final_stats=1
+
+      - name: Upload crashes
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuzz-artifacts
+          path: fuzz/artifacts/

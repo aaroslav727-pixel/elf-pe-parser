@@ -131,7 +131,7 @@ std::string render_text(const ElfFile& f, std::string_view path, const ReportOpt
     line(out, "NX", to_string(c.nx));
     line(out, "PIE", to_string(c.pie));
     line(out, "Fortify",
-         c.fortify ? "Yes (" + std::to_string(c.fortified.size()) + " fortified functions)" : std::string("No"));
+         c.fortify ? "Yes (" + std::to_string(c.fortified.size()) + (c.fortified.size() == 1 ? " fortified function)" : " fortified functions)") : std::string("No"));
     line(out, "RPATH", c.rpath.empty() ? "No RPATH" : printable(c.rpath));
     line(out, "RUNPATH", c.runpath.empty() ? "No RUNPATH" : printable(c.runpath));
     line(out, "Stripped", c.stripped ? "Yes (no .symtab)" : "No");
